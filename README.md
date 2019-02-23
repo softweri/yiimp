@@ -1,4 +1,6 @@
 ### Welcome to the cryptopool.builders github!
+### This is a devlopment staging area for tests done on stratum updates. Trying to install stratum updates from this branch will probably break your server. No matter how cool something might look do NOT use this branch to build from until it is pushed to the 'NEXT' branch.
+
 ### This fork of YiiMP is designed to work with our Ultimate Crypto-Server Installer program.
 Trying to install this on a server not built by our installer will cause headaches, frustrations, and screaming loudly at your monitor.
 
