@@ -9,7 +9,6 @@ function WriteBoxHeader($title)
 
 $showrental = (bool) YAAMP_RENTAL;
 
-// Ability to pass ?algo=all or ?algo=x16s,neoscrypt from URL
 $algo_from_query_param = getparam('algo');
  if($algo_from_query_param) {
 	// Query param is set
@@ -25,7 +24,6 @@ $algo_from_query_param = getparam('algo');
 	}
 }
 
-
 $count = getparam('count');
 $count = $count? $count: 50;
 
@@ -36,7 +34,7 @@ $criteria = new CDbCriteria();
 $criteria->condition = "t.category NOT IN ('stake','generated')";
 $criteria->condition .= " AND IFNULL(coin.visible,1)=1"; // ifnull for rental
 if(isset($r_algo)) {
-$criteria->addInCondition('t.algo', $r_algo);
+	$criteria->addInCondition('t.algo', $r_algo);
 }
 $criteria->limit = $count;
 $criteria->order = 't.time DESC';
@@ -121,7 +119,7 @@ foreach($db_blocks as $db_block)
 			$t = (int) ($coin->mature_blocks - $db_block->confirmations) * $coin->block_time;
 			$eta = "ETA: ".sprintf('%dh %02dmn', ($t/3600), ($t/60)%60);
 		}
-		echo '<span class="block immature" title="'.$eta.'">Immature ('.$db_block->confirmations.'/'.$coin->mature_blocks.')</span>';
+		echo '<span class="block immature" title="'.$eta.'">Immature ('.$db_block->confirmations.')</span>';
 	}
 	else if($db_block->category == 'generate')
 		echo '<span class="block confirmed">Confirmed</span>';
@@ -136,3 +134,7 @@ foreach($db_blocks as $db_block)
 echo "</table>";
 
 echo "<br></div></div><br>";
+
+
+
+

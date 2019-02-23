@@ -12,9 +12,11 @@ JavascriptFile('/yaamp/ui/js/auto_refresh.js');
 $height = '240px';
 
 $min_payout = floatval(YAAMP_PAYMENTS_MINI);
+$btc_min_payout = floatval(YAAMP_BTC_PAYMENTS_MINI);
 $min_sunday = $min_payout/10;
 
 $payout_freq = (YAAMP_PAYMENTS_FREQ / 3600)." hours";
+$btc_payout_freq = (YAAMP_BTC_PAYMENTS_FREQ / 3600)." hours";
 ?>
 
 <div id='resume_update_button' style='color: #444; background-color: #ffd; border: 1px solid #eea;
@@ -28,120 +30,225 @@ $payout_freq = (YAAMP_PAYMENTS_FREQ / 3600)." hours";
 <!--  -->
 
 <div class="main-left-box">
-<div class="main-left-title">domain</div>
+<div class="main-left-title">thepool.life</div>
 <div class="main-left-inner">
 
 <ul>
 
-<li>Welcome to your new mining pool, domain! </li>
-<li>This installation was completed using the Ultimate Crypto-Server Setup Installer.</li>
-<li>Any edits to this page should be made to, /home/crypto-data/yiimp/site/web/yaamp/modules/site/index.php</li>
-<li>&nbsp;</li>
-<li>No registration is required, we do payouts in the currency you mine. Use your wallet address as the username.</li>
-<li>&nbsp;</li>
-<li>Payouts are made automatically every <?= $payout_freq ?> for all balances above <b><?= $min_payout ?></b>, or <b><?= $min_sunday ?></b> on Sunday.</li>
-<li>For some coins, there is an initial delay before the first payout, please wait at least 6 hours before asking for support.</li>
-<li>Blocks are distributed proportionally among valid submitted shares.</li>
+<li><img src="/images/logo.png" align="left" height="150px" hspace="10px" <="" img=""></li>
+<div></div>
+	<li>Welcome to thepool.life mining pool.</li>
+	<li>thepool.life offers multiple world-wide stratum servers to bring you the best mining experience.</li>
+	<li>&nbsp;</li>
+	<li>No registration is required to mine with us. All payouts are done in the currency you mine. Use your wallet address as your username.</li>
+	<!-- <li>Coins that are exchange enabled can be mined with and paid out to your BTC wallet address.</li> -->
+	<li>See payout information below in our stratum sections.</li>
+	<!-- <li><div style="float:right;">For some coins, there is an initial delay before the first payout, please wait at least 6 hours before asking for support.</div></li> -->
+	<!-- <li>Block reward is split according to the number of valid shares submitted.</li> -->
 
 <br/>
 
 </ul>
+
+</div></div>
+<br/>
+
+<div class="main-left-box">
+<div class="main-left-title">thepool.life announcements</div>
+<div class="main-left-inner">
+
+<div></div><ul>
+        <li><b>February promotion on thepool.life</b></li>
+        <li>Mine any of our coins during the month of February and have a chance to win 0.1 BTC worth of that coin!</li>
+        <li>&nbsp;</li>
+        <li>To win all you have to do is mine any of our coins from now until February 28th 2019. On Saturday March 2nd one random wallet will be selected as the winner.</li>
+        <li>0.1BTC worth of the winning wallets mined coin will be purchased and then sent to the selected address.</li>
+	<li>Good luck and happy mining!</li>
+<br/>
+	<li><b>Our Twitter and Facebook pages are now active! Click on the links below to like and follow to stay up to date with new coin releases and promos!</li>
+</ul>
+
 </div></div>
 <br/>
 
 <!--  -->
 
 <div class="main-left-box">
-<div class="main-left-title">How to mine with domain</div>
+<div class="main-left-title">How to mine with thepool.life</div>
 <div class="main-left-inner">
-
-<ul>
 
 <table>
 <thead>
 <tr>
-<th>Stratum</th>
+<th>Stratum Location</th>
 <th>Coin</th>
 <th>Wallet Address</th>
-<th>RigName</th>
+<th>Rig Name</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>
-<select id="drop-stratum" colspan="2" style="min-width: 140px">
-	<option value="mine.">US Stratum</option>
-	<option value="cdn.">CDN Stratum</option>
-	<option value="euro.">Euro Stratum</option>
+<select id="drop-stratum" colspan="2" style="min-width: 140px; border-style:solid; padding: 3px; font-family: monospace; border-radius: 5px;">
+	<option value="mine.">US East</option>
+	<option value="us.west.">US West</option>
+	<option value="aus.">AUS Stratum</option>
+	<option value="cad.">CAD Stratum</option>
 	<option value="uk.">UK Stratum</option>
 </select>
 </td>
 <td>
-<select id="drop-coin">
-<option data-port='4533' data-algo='-a lyra2v2' data-symbol='SECI'>SECI (SECI)</option>
-<option data-port='7006' data-algo='-a x22i' data-symbol='SUQA'>SUQA (SUQA)</option>
-<option data-port='7008' data-algo='-a x11' data-symbol='FTO'>Futuro (FTO)</option>
+<select id="drop-coin" style="border-style:solid; padding: 3px; font-family: monospace; border-radius: 5px;">
+
+
+<?php
+$list = getdbolist('db_coins', "enable and visible and auto_ready order by algo asc");
+
+$algoheading="";
+$count=0;
+foreach($list as $coin)
+			{
+			$name = substr($coin->name, 0, 18);
+			$symbol = $coin->getOfficialSymbol();
+          $id = $coin->id;
+          $algo = $coin->algo;
+
+$port_count = getdbocount('db_stratums', "algo=:algo and symbol=:symbol", array(
+':algo' => $algo,
+':symbol' => $symbol
+));
+
+$port_db = getdbosql('db_stratums', "algo=:algo and symbol=:symbol", array(
+':algo' => $algo,
+':symbol' => $symbol
+));
+
+if ($port_count >= 1){$port = $port_db->port;}else{$port = '0.0.0.0';}
+if($count == 0){ echo "<option disabled=''>$algo";}elseif($algo != $algoheading){echo "<option disabled=''>$algo</option>";}
+echo "<option data-port='$port' data-algo='-a $algo' data-symbol='$symbol'>$name ($symbol)</option>";
+
+$count=$count+1;
+$algoheading=$algo;
+}
+?>
 </select>
 </td>
 <td>
-<input id="text-wallet" type="text" size="44" placeholder="RF9D1R3Vt7CECzvb1SawieUC9cYmAY1qoj">
-</td><td>
-<input id="text-rig-name" type="text" size="10" placeholder="8Cards">
+<input id="text-wallet" type="text" size="44" placeholder="RF9D1R3Vt7CECzvb1SawieUC9cYmAY1qoj" style="border-style:solid; border-width: thin; padding: 3px; font-family: monospace; border-radius: 5px;">
 </td>
 <td>
-<input id="Generate!" type="button" value="Start Mining" onclick="generate()">
+<input id="text-rig-name" type="text" size="10" placeholder="001" style="border-style:solid; border-width: thin; padding: 3px; font-family: monospace; border-radius: 5px;">
+</td>
+<td>
+<input id="Generate!" type="button" value="Start Mining" onclick="generate()" style="border-style:solid; padding: 3px; font-family: monospace; border-radius: 5px;">
 </td>
 </tr>
-<tr><td colspan="5"><p class="main-left-box" style="padding: 3px; background-color: #ffffee; font-family: monospace;" id="output">-a xevan -o stratum+tcp://mine.thepool.life:4533 -u . -p c=SAP</p>
+<tr><td colspan="5"><p class="main-left-box" style="padding: 3px; background-color: #ffffee; font-family: monospace;" id="output">-a  -o stratum+tcp://mine.thepool.life:0000 -u . -p c=</p>
 </td>
 </tr>
 </tbody></table>
-
-<?php if (YAAMP_ALLOW_EXCHANGE): ?>
-<li>&lt;WALLET_ADDRESS&gt; can be one of any currency we mine or a BTC address.</li>
-<?php else: ?>
-<li>&lt;WALLET_ADDRESS&gt; should be valid for the currency you mine. <b>DO NOT USE a BTC address here, the auto exchange is disabled</b>!</li>
-<?php endif; ?>
-<li>As optional password, you can use <b>-p c=&lt;SYMBOL&gt;</b> if yiimp does not set the currency correctly on the Wallet page.</li>
-<li>See the "Pool Status" area on the right for PORT numbers. Algorithms without associated coins are disabled.</li>
-
+<ul>
+<li>&lt;WALLET_ADDRESS&gt; must be valid for the currency you mine. <b>DO NOT USE a BTC address here, the auto exchange is disabled on these stratums</b>!</li>
+<li><b>Our stratums are now NiceHASH compatible, please message support if you have any issues.</b></li>
+<li>See the "thepool.life coins" area on the right for PORT numbers. You may mine any coin regardless if the coin is enabled or not for autoexchange. Payouts will only be made in that coins currency.</li>
+<li>Payouts are made automatically every hour for all balances above <b><?= $min_payout ?></b>, or <b><?= $min_sunday ?></b> on Sunday.</li>
 <br>
 
 </ul>
 </div></div><br>
 
 <!--  -->
-
+<!--
 <div class="main-left-box">
-<div class="main-left-title">Site Links</div>
+<div class="main-left-title">thepool.life autoexchanged stratum</div>
 <div class="main-left-inner">
 
-<ul>
+	<table>
+	<thead>
+	<tr>
+	<th>Stratum Location</th>
+	<th>Coin</th>
+	<th>Wallet Address</th>
+	<th>Rig Name</th>
+	</tr>
+	</thead>
+	<tbody><tr>
+	<td>
+	<select id="drop-stratumb" colspan="2" style="min-width: 140px; border-style:solid; padding: 3px; font-family: monospace; border-radius: 5px;">
+		<option value="autoexchange.">Exchange Stratum</option>
+	</select>
+	</td>
+	<td>
+	<select id="drop-coinb" style="border-style:solid; padding: 3px; font-family: monospace; border-radius: 5px;">
 
-<li><b>API</b> - <a href='/site/api'>http://<?= YAAMP_SITE_URL ?>/site/api</a></li>
-<li><b>Difficulty</b> - <a href='/site/diff'>http://<?= YAAMP_SITE_URL ?>/site/diff</a></li>
-<?php if (YIIMP_PUBLIC_BENCHMARK): ?>
-<li><b>Benchmarks</b> - <a href='/site/benchmarks'>http://<?= YAAMP_SITE_URL ?>/site/benchmarks</a></li>
-<?php endif; ?>
 
-<?php if (YAAMP_ALLOW_EXCHANGE): ?>
-<li><b>Algo Switching</b> - <a href='/site/multialgo'>http://<?= YAAMP_SITE_URL ?>/site/multialgo</a></li>
-<?php endif; ?>
+	<?php
+	$list = getdbolist('db_coins', "enable and visible and not dontsell and auto_ready order by algo asc");
 
-<br>
+	$algoheading="";
+	$count=0;
+	foreach($list as $coin)
+				{
+				$name = substr($coin->name, 0, 18);
+				$symbol = $coin->getOfficialSymbol();
+	          $id = $coin->id;
+	          $algo = $coin->algo;
 
-</ul>
-</div></div><br>
+	$port_count = getdbocount('db_stratums', "algo=:algo and symbol=:symbol", array(
+	':algo' => $algo,
+	':symbol' => $symbol
+	));
 
+	$port_db = getdbosql('db_stratums', "algo=:algo and symbol=:symbol", array(
+	':algo' => $algo,
+	':symbol' => $symbol
+	));
+
+	$port = $port_db->port;
+
+	if($count == 0){ echo "<option disabled=''>$algo";}elseif($algo != $algoheading){echo "<option disabled=''>$algo</option>";}
+	echo "<option data-port='$port' data-algo='-a $algo' data-symbol='$symbol'>$name ($symbol)</option>";
+
+	$count=$count+1;
+	$algoheading=$algo;
+	}
+	?>
+	</select>
+	</td>
+	<td>
+	<input id="text-walletb" type="text" size="44" placeholder="RF9D1R3Vt7CECzvb1SawieUC9cYmAY1qoj" style="border-style:solid; border-width: thin; padding: 3px; font-family: monospace; border-radius: 5px;">
+	</td>
+	<td>
+	<input id="text-rig-nameb" type="text" size="10" placeholder="001" style="border-style:solid; border-width: thin; padding: 3px; font-family: monospace; border-radius: 5px;">
+	</td>
+	<td>
+	<input id="Generate!" type="button" value="Start Mining" onclick="generateb()" style="border-style:solid; padding: 3px; font-family: monospace; border-radius: 5px;">
+	</td>
+	</tr>
+	<tr><td colspan="5"><p class="main-left-box" style="padding: 3px; background-color: #ffffee; font-family: monospace;" id="outputb">-a -o stratum+tcp://autoexchange.thepool.life:0000 -u . -p c=</p>
+	</td>
+	</tr>
+	</tbody></table>
+	<ul>
+		<li>&lt;WALLET_ADDRESS&gt; must be a valid BTC address. <b>Your password, must use <b>-p c=&lt;BTC&gt;</b> or payouts maybe delayed</b>!</li>
+		<li>See the "Pool Status" area on the right for autoexchange enabled coins. Only those coins can be mined on this stratum.</li>
+		<li>Payouts are made automatically every <?= $btc_payout_freq ?> for all balances above <b><?= $btc_min_payout ?></b> BTC.</li>
+	<br>
+
+	</ul>
+	</div></div><br>
+-->
 <div class="main-left-box">
-<div class="main-left-title">domain Support</div>
+<div class="main-left-title">thepool.life Support</div>
 <div class="main-left-inner">
 
 <ul class="social-icons">
-    <li><a href="http://www.facebook.com"><img src='/images/Facebook.png' /></a></li>
-    <li><a href="http://www.twitter.com"><img src='/images/Twitter.png' /></a></li>
-    <li><a href="http://www.youtube.com"><img src='/images/YouTube.png' /></a></li>
-    <li><a href="http://www.github.com"><img src='/images/Github.png' /></a></li>
-	<li><a href="http://www.discord.com"><img src='/images/discord.png' /></a></li>
+    <li><a href="https://www.facebook.com/mine.thepool.life/"><img src='/images/Facebook.png' alt="www.facebook.com/mine.thepool.life" /></a></li>
+    <li><a href="https://twitter.com/thepool_life"><img src='/images/Twitter.png' alt="www.twitter.com/thepool_life" /></a></li>
+    <li><a href="https://www.youtube.com/channel/UCcuXk3XxuiP1ogaKgcfcdIQ"><img src='/images/YouTube.png' alt="Cryptopool.builders YouTube Tutorial Videos" /></a></li>
+    <li><a href="https://github.com/cryptopool-builders/Multi-Pool-Installer"><img src='/images/Github.png' alt="Multi-Pool Installer on GitHub" /></a></li>
+    <li><a href="https://discord.gg/CAFmbyH"><img src='/images/discord.png' alt="thepool.life Discord Channel" /></a></li>
+		<li><a href="https://play.google.com/store/apps/details?id=kg.stark.jarvis"><img src='/images/mpm.png' alt="MPM - Multiple Pool Monitor" /></a></li>
+		<li><a href="https://www.crypto-coinz.net/crypto-calculator"><img src='/images/calculator.png' alt="Crypto Calculator" /></a></li>
 </ul>
 
 </div></div><br>
@@ -225,4 +332,26 @@ function generate(){
 		document.getElementById('output').innerHTML = result;
 }
 generate();
+</script>
+
+<script>
+function getLastUpdatedb(){
+	var drop1 = document.getElementById('drop-stratumb');
+	var drop2 = document.getElementById('drop-coinb');
+	var rigName = document.getElementById('text-rig-nameb').value;
+	var result = '';
+
+	result += drop2.options[drop2.selectedIndex].dataset.algo + ' -o stratum+tcp://';
+	result += drop1.value + 'thepool.life:';
+	result += drop2.options[drop2.selectedIndex].dataset.port + ' -u ';
+	result += document.getElementById('text-walletb').value;
+	if (rigName) result += '.' + rigName;
+	result += ' -p c=BTC';
+	return result;
+}
+function generateb(){
+  	var result = getLastUpdatedb()
+		document.getElementById('outputb').innerHTML = result;
+}
+generateb();
 </script>

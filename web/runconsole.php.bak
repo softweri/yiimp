@@ -2,13 +2,16 @@
 
 if(php_sapi_name() != "cli") return;
 
-require_once('/home/crypto-data/yiimp/site/configuration/serverconfig.php');
+require_once('serverconfig.php');
 require_once('yaamp/defaultconfig.php');
 
 require_once('framework/yii.php');
 require_once('yaamp/include.php');
 
-$app = Yii::createWebApplication('yaamp/config.php');
+require_once('yaamp/components/CYiimpConsoleApp.php');
+
+$config = require_once('yaamp/console.php');
+$app = Yii::createApplication('CYiimpConsoleApp', $config);
 
 try
 {
@@ -19,8 +22,8 @@ catch(CException $e)
 {
 	debuglog($e, 5);
 
-// 	$message = $e->getMessage();
+	$message = $e->getMessage();
+	echo "exception: $message\n";
 // 	send_email_alert('backend', "backend error", "$message");
 }
-
 

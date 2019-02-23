@@ -53,7 +53,7 @@ class db_coins extends CActiveRecord
 			'usesegwit'	=> 'Use segwit',
 			'market'	=> 'Preferred market',
 			'rpcencoding'	=> 'RPC Type',
-			'specifications'=> 'AddNodes'
+			'specifications'=> 'Notes'
 		);
 	}
 

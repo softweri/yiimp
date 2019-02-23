@@ -1,6 +1,6 @@
 <?php
 
-require_once('/home/crypto-data/yiimp/site/configuration/serverconfig.php');
+require_once('serverconfig.php');
 require_once('yaamp/defaultconfig.php');
 
 class CronjobController extends CommonController
@@ -35,7 +35,7 @@ class CronjobController extends CommonController
 		else if(!$webserver_running)
 		{
 			debuglog('starting webserver');
-			system("sudo service $webserver start");
+			system("service $webserver start");
 		}
 	}
 
@@ -197,24 +197,14 @@ class CronjobController extends CommonController
 		$mining = getdbosql('db_mining');
 		if($mining->last_payout + YAAMP_PAYMENTS_FREQ > time()) return;
 
-
-		debuglog("---Running Coin Payments---");
+		debuglog("--------------------------------------------------------");
 
 		$mining->last_payout = time();
 		$mining->save();
 
-		$btc_mining = getdbosql('db_mining');
-		if($btc_mining->btc_last_payout + YAAMP_BTC_PAYMENTS_FREQ > time()) return;
-
-		debuglog("---Running BTC Payments---");
-
-		$btc_mining->btc_last_payout = time();
-		$btc_mining->save();
-
-
-//		memcache_set($this->memcache->memcache, 'apache_locked', true);
-//		if(YAAMP_USE_NGINX)
-//			system("sudo service nginx stop");
+		memcache_set($this->memcache->memcache, 'apache_locked', true);
+		if(YAAMP_USE_NGINX)
+			system("service nginx stop");
 
 		sleep(10);
 		BackendDoBackup();
@@ -225,11 +215,6 @@ class CronjobController extends CommonController
 		BackendPayments();
 		memcache_set($this->memcache->memcache, 'balances_locked', false);
 
-		// prevent user balances changes during payments (blocks thread)
-		memcache_set($this->memcache->memcache, 'balances_locked', true, 0, 300);
-		BTCBackendPayments();
-		memcache_set($this->memcache->memcache, 'balances_locked', false);
-
 		BackendCleanDatabase();
 
 	//	BackendOptimizeTables();
@@ -237,3 +222,4 @@ class CronjobController extends CommonController
 	}
 
 }
+

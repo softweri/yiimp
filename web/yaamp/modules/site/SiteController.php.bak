@@ -561,11 +561,6 @@ class SiteController extends CommonController
 		$this->render('about');
 	}
 
-	public function phpMyadmin()
-	{
-		$this->render('phpmyadmin');
-	}
-
 	public function actionTerms()
 	{
 		$this->render('terms');

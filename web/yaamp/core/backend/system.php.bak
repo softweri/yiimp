@@ -3,7 +3,7 @@
 function BackendDoBackup()
 {
 	$d = date('Y-m-d-H', time());
-	$filename = "/home/crypto-data/yiimp/site/backup/yaamp-$d.sql";
+	$filename = "/root/backup/yaamp-$d.sql";
 
 	if (is_readable("/usr/bin/xz")) {
 		$ziptool = "xz --threads=4"; $ext = ".xz";

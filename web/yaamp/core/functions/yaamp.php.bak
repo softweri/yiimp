@@ -371,46 +371,46 @@ function getAlgoPort($algo)
 
 ////////////////////////////////////////////////////////////////////////
 
-function yaamp_fee($algo, $user=null, $coin=null)
+function yaamp_fee($algo)
 {
 	$fee = controller()->memcache->get("yaamp_fee-$algo");
-	if ($user)
-		$fee = controller()->memcache->get("yaamp_fee-$user-$algo");
-	if ($coin)
-			$fee = controller()->memcache->get("yaamp_fee-$coin-$algo");
-	if($fee) return $fee;
-	$norm = yaamp_get_algo_norm($algo);
+	if($fee && is_numeric($fee)) return (float) $fee;
+
+/*	$norm = yaamp_get_algo_norm($algo);
 	if($norm == 0) $norm = 1;
+
 	$hashrate = getdbosql('db_hashrate', "algo=:algo order by time desc", array(':algo'=>$algo));
 	if(!$hashrate || !$hashrate->difficulty) return 1;
+
 	$target = yaamp_hashrate_constant($algo);
 	$interval = yaamp_hashrate_step();
 	$delay = time()-$interval;
+
 	$rate = controller()->memcache->get_database_scalar("yaamp_pool_rate_coinonly-$algo",
 		"select sum(difficulty) * $target / $interval / 1000 from shares where valid and time>$delay and algo=:algo and jobid=0", array(':algo'=>$algo));
+
 //	$fee = round(log($hashrate->hashrate * $norm / 1000000 / $hashrate->difficulty + 1), 1) + YAAMP_FEES_MINING;
 //	$fee = round(log($rate * $norm / 2000000 / $hashrate->difficulty + 1), 1) + YAAMP_FEES_MINING;
-	global $configUserFees;
-	if (isset($configUserFees[$user])) {
-		$fee = (float) $configUserFees[$user];
-		controller()->memcache->set("yaamp_fee-$user-$algo", $fee);
-		
-	} else {
-		$fee = YAAMP_FEES_MINING;
-		// local fees config
-		global $configFixedPoolFees;
-		if (isset($configFixedPoolFees[$algo])) {
-			$fee = (float) $configFixedPoolFees[$algo];
-		}
-		controller()->memcache->set("yaamp_fee-$algo", $fee);
+*/
+	$fee = YAAMP_FEES_MINING;
+
+	// local fees config
+	global $configFixedPoolFees;
+	if (isset($configFixedPoolFees[$algo])) {
+		$fee = (float) $configFixedPoolFees[$algo];
 	}
+
+	controller()->memcache->set("yaamp_fee-$algo", $fee);
 	return $fee;
 }
-function take_yaamp_fee($v, $algo, $percent=-1, $user=null)
+
+function take_yaamp_fee($v, $algo, $percent=-1)
 {
-	if ($percent == -1) $percent = yaamp_fee($algo, $user);
+	if ($percent == -1) $percent = yaamp_fee($algo);
+
 	return $v - ($v * $percent / 100.0);
 }
+
 function yaamp_hashrate_constant($algo=null)
 {
 	return pow(2, 42);		// 0x400 00000000

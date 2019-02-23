@@ -2,7 +2,7 @@
 
 if(php_sapi_name() != "cli") return;
 
-require_once('serverconfig.php');
+require_once('/home/crypto-data/yiimp/site/configuration/serverconfig.php');
 require_once('yaamp/defaultconfig.php');
 
 require_once('framework/yii.php');
