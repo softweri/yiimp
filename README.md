@@ -1,5 +1,5 @@
 ### Welcome to the cryptopool.builders github!
-### This fork of YiiMP is designed to work with our Ultimate Crypto-Server Installer program.
+### This branch of YiiMP is designed to work with https://thepool.life.
 Trying to install this on a server not built by our installer will cause headaches, frustrations, and screaming loudly at your monitor.
 
 #### Please go to https://github.com/cryptopool-builders/Multi-Pool-Installer for our installer.
@@ -7,16 +7,7 @@ Trying to install this on a server not built by our installer will cause headach
 ## Changes to this fork include but not limited to:
 
 ```
-- File structure -
-$STORAGE_ROOT/yiimp/site/web
-$STORAGE_ROOT/yiimp/site/stratum (Only on single server installs)
-$STORAGE_ROOT/yiimp/site/configuration
-$STORAGE_ROOT/yiimp/site/crons
-$STORAGE_ROOT/yiimp/site/log
-$STORAGE_ROOT/yiimp/starts
-
-- Site Files-
-Updated various files to work with new file structure
+Direct file edits for https://thepool.life this branch should not be used on your pool.
 ```
 
 
