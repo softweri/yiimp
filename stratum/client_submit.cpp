@@ -18,8 +18,11 @@ void build_submit_values(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE *tem
 
 	char doublehash[128];
 	memset(doublehash, 0, 128);
-
+	char veildatahash[1024];
+	memset(veildatahash, 0, 1024);
+	
 	// some (old) wallet/algos need a simple SHA256 (blakecoin, whirlcoin, groestlcoin...)
+
 	YAAMP_HASH_FUNCTION merkle_hash = sha256_double_hash_hex;
 	if (g_current_algo->merkle_func)
 		merkle_hash = g_current_algo->merkle_func;
@@ -31,6 +34,24 @@ void build_submit_values(YAAMP_JOB_VALUES *submitvalues, YAAMP_JOB_TEMPLATE *tem
 #ifdef MERKLE_DEBUGLOG
 	printf("merkle root %s\n", merkleroot.c_str());
 #endif
+	
+		// build veildatahash
+			templ->claim_be, ntime, templ->nbits, nonce);		if (!strcmp(g_stratum_algo, "x16rt"))
+	{
+		char merklerootbyteswap[128];
+		memcpy(merklerootbyteswap,merkleroot.c_str(),64);
+
+ 		char merklerootswap[128];
+		memset(merklerootswap,0,128);
+		string_be(merklerootbyteswap,merklerootswap);
+
+ 		sprintf(veildatahash, "%s%s%s%s%s%s%s%s%s%s%s%s",merklerootswap,merklerootswap,"04","0a00000000000000",templ->veil_accum10,"6400000000000000",templ->veil_accum100,"e803000000000000",templ->veil_accum1000,"1027000000000000",templ->veil_accum10000,templ->veil_pofn);
+		printf("veildatahash: %s\n", veildatahash);
+	}
+
+ 	// build blockheader
+	if (!strcmp(g_stratum_algo, "x16rt")) {
+		sprintf(submitvalues->header, "%s%s%s%s%s%s%s", templ->version, templ->prevhash_be, submitvalues->merkleroot_be, templ->claim_be, ntime, templ->nbits, nonce);
 	if (!strcmp(g_current_algo->name, "lbry")) {
 		sprintf(submitvalues->header, "%s%s%s%s%s%s%s", templ->version, templ->prevhash_be, submitvalues->merkleroot_be,
 			templ->claim_be, ntime, templ->nbits, nonce);
@@ -499,6 +520,8 @@ bool client_submit(YAAMP_CLIENT *client, json_value *json_params)
 
 	YAAMP_JOB_VALUES submitvalues;
 	memset(&submitvalues, 0, sizeof(submitvalues));
+	
+	build_submit_values(&submitvalues, templ, client->extranonce1, extranonce2, ntime, nonce);
 
 	if(is_decred)
 		build_submit_values_decred(&submitvalues, templ, client->extranonce1, extranonce2, ntime, nonce, vote, true);
