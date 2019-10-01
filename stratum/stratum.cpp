@@ -114,6 +114,7 @@ static void neoscrypt_hash(const char* input, char* output, uint32_t len)
 YAAMP_ALGO g_algos[] =
 {
 	{"a5a", a5a_hash, 0x10000, 0, 0},
+	{"equihash", equi_hash, 1, 0, 0}, // equi 192 only
 	{"aergo", aergo_hash, 1, 0, 0},
 	{"allium", allium_hash, 0x100, 0, 0},
 	{"argon2d-crds", argon2d_crds_hash, 0x10000, 0, 0 },
